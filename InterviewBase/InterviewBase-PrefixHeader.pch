@@ -1,0 +1,25 @@
+//
+//  InterviewBase-PrefixHeader.pch
+//  InterViewBase
+//
+//  Created by Nemes Norbert on 12/19/17.
+//  Copyright © 2017 Nemes Norbert. All rights reserved.
+//
+
+#ifndef InterviewBase_PrefixHeader_pch
+#define InterviewBase_PrefixHeader_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+#endif /* InterviewBase_PrefixHeader_pch */
+
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+#import "Constants.h"
+#import "UIImage+Colour.h"
+#import "IBNavigationManager.h"
+#import "IBNetworkManager.h"
+#import "IBContentManager.h"
+#import "NSDateFormatter+ThreadSafe.h"
+
