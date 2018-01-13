@@ -7,9 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "IBProgramme.h"
 
-@interface IBProgramCollectionViewCell : UICollectionViewCell{
-    UILabel *valueLabel;
+@interface IBProgramCollectionViewCell : UICollectionViewCell {
+    UILabel *startTimeLabel;
+    UILabel *titleLabel;
+    
 }
+
+@property (nonatomic, strong) IBProgramme *program;
 
 @end

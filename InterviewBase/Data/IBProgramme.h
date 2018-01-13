@@ -15,4 +15,6 @@
 @property (nonatomic, strong) NSDate *startDate;
 @property (nonatomic, strong) NSDate *endDate;
 
+- (NSTimeInterval)getPlaytimeInSeconds;
+
 @end

@@ -19,7 +19,8 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = [UIColor redColor];
+    self.view.autoresizesSubviews = YES;
 
 }
 
@@ -33,7 +34,9 @@
                 collectionView = nil;
             }
 
-            collectionView = [[IBProgramCollectionView alloc] initWithFrame:self.view.frame columnTitles:[self generateTitleArray] rowTitles:[self generateRowTitleArray] dataArray:[self generateDataArray]];
+            collectionView = [[IBProgramCollectionView alloc] initWithFrame:self.view.frame columnTitles:[self generateTitleArray] rowTitles:[self generateRowTitleArray] dataArray:kContentManager.channels];
+            collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+            [collectionView setNow];
             [self.view addSubview:collectionView];
         }
     }];
@@ -48,10 +51,26 @@
 
 - (NSArray *)generateTitleArray {
     NSMutableArray *tempArray = [NSMutableArray array];
-    for (NSInteger i = 0; i < 24; i++) {
-        [tempArray addObject:[NSString stringWithFormat:@"%2ld:00", (long)i]];
-        [tempArray addObject:[NSString stringWithFormat:@"%2ld:30", (long)i]];
+    
+    NSString *minimumMinuteString = [NSDateFormatter stringFromDate:kContentManager.minimumDate forDateFormat:@"mm"];
+    NSString *minimumHourString = [NSDateFormatter stringFromDate:kContentManager.minimumDate forDateFormat:@"hh"];
+    
+    NSDate *iteratingDate = kContentManager.minimumDate;
+
+    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier: NSCalendarIdentifierGregorian];
+    NSDateComponents *components = [calendar components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:iteratingDate];
+    [components setMinute:30];
+    
+    if ([minimumMinuteString integerValue] >= 30) {
+        [tempArray addObject:[NSString stringWithFormat:@"%@:30", minimumHourString]];
+        iteratingDate = [calendar dateFromComponents:components];
     }
+    
+    while ([iteratingDate compare:kContentManager.maximumDate] == NSOrderedAscending) {
+        [tempArray addObject:[NSDateFormatter stringFromDate:iteratingDate forDateFormat:@"HH:mm"]];
+        iteratingDate = [iteratingDate dateByAddingTimeInterval:30.0f * 60.0f];
+    }
+
     return [NSArray arrayWithArray:tempArray];
 }
 
@@ -61,24 +80,6 @@
         [tempArray addObject:channel.title];
     }
     return [NSArray arrayWithArray:tempArray];
-}
-
-- (NSArray *)generateDataArray {
-    NSMutableArray *tempArray = [NSMutableArray array];
-
-    NSArray *titlesArray = [self generateTitleArray];
-    
-    for (IBTVChannel *channel in kContentManager.channels) {
-        NSMutableArray *tempDataArray = [NSMutableArray new];
-        
-        for (NSString *columnTitle in titlesArray) {
-            NSNumber *dummyData = @1;
-            [tempDataArray addObject:dummyData];
-        }
-        [tempArray addObject:tempDataArray];
-    }
-    
-    return tempArray;
 }
 
 /*

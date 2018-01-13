@@ -22,5 +22,5 @@
 //@property (nonatomic, weak) id<TableViewDelegate> delegate;
 
 - (instancetype)initWithFrame:(CGRect)frame columnTitles:(NSArray *)_columnTitles rowTitles:(NSArray *)_rowTitles dataArray:(NSArray *)_dataArray;
-
+- (void)setNow;
 @end

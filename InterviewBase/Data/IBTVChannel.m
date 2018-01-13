@@ -38,4 +38,32 @@
                                                                   }];
 }
 
+- (NSDate *)getMinimumDate {
+    NSDate *minimumDate = nil;
+    for (IBProgramme *tempProgram in self.program) {
+        if (minimumDate) {
+            if ([minimumDate compare:tempProgram.startDate] == NSOrderedDescending) {
+                minimumDate = tempProgram.startDate;
+            }
+        } else {
+            minimumDate = tempProgram.startDate;
+        }
+    }
+    return minimumDate;
+}
+
+- (NSDate *)getMaximumDate {
+    NSDate *maximumDate = nil;
+    for (IBProgramme *tempProgram in self.program) {
+        if (maximumDate) {
+            if ([maximumDate compare:tempProgram.endDate] == NSOrderedAscending) {
+                maximumDate = tempProgram.endDate;
+            }
+        } else {
+            maximumDate = tempProgram.startDate;
+        }
+    }
+    return maximumDate;
+}
+
 @end

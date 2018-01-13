@@ -15,4 +15,7 @@
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, strong) NSArray *program;
 
+- (NSDate *)getMinimumDate;
+- (NSDate *)getMaximumDate;
+
 @end

@@ -19,7 +19,7 @@
         }
         
         if ([dict objectForKey:@"end_date"] && [[dict objectForKey:@"end_date"] isKindOfClass:[NSString class]]) {
-            self.endDate = [NSDateFormatter dateFromString:[dict objectForKey:@"start_date"] forDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+            self.endDate = [NSDateFormatter dateFromString:[dict objectForKey:@"end_date"] forDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
         }
     }
     
@@ -30,6 +30,14 @@
     return [[JSONKeyMapper alloc] initWithModelToJSONDictionary:@{ @"startDate" : @"start_date",
                                                                    @"endDate" : @"end_date"
                                                                    }];
+}
+
+- (NSTimeInterval)getPlaytimeInSeconds {
+    if (self.startDate && self.endDate) {
+        return [self.endDate timeIntervalSinceDate:self.startDate];
+    }
+    
+    return 0;
 }
 
 @end

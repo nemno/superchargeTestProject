@@ -10,6 +10,10 @@
 #import "IBProgramCollectionViewLayout.h"
 #import "IBProgramTitleCollectionViewCell.h"
 #import "IBProgramCollectionViewCell.h"
+#import "IBTVChannel.h"
+#import "IBProgramme.h"
+
+#define timeWidthUnit (200.0f / (30.0f * 60.0f))
 
 @implementation IBProgramCollectionView{
     UIView *horizontalSeparatorView;
@@ -27,12 +31,9 @@
         
         horizontalSeparatorView = [[UIView alloc] init];
         horizontalSeparatorView.backgroundColor = [UIColor blueColor];
-        [self addSubview:horizontalSeparatorView];
         
         verticalSeparatorView = [[UIView alloc] init];
         verticalSeparatorView.backgroundColor = [UIColor blueColor];
-        [self addSubview:verticalSeparatorView];
-        
         
         columnTitlesCollectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:[[IBProgramCollectionViewLayout alloc] init]];
         columnTitlesCollectionView.backgroundColor = [UIColor blueColor];
@@ -98,6 +99,19 @@
     return self;
 }
 
+- (void)setNow {
+    //JUST FOR TESTING DUMMY
+//    NSDate *date = [NSDateFormatter dateFromString:@"2017-01-15-23:50:00" forDateFormat:@"yyyy-MM-dd-HH:mm:ss"];
+    
+    if ([NOW compare:kContentManager.minimumDate] == NSOrderedDescending && [NOW compare:kContentManager.maximumDate] == NSOrderedAscending) {
+        UIView *nowLineView = [UIView new];
+        nowLineView.backgroundColor = [UIColor whiteColor];
+        nowLineView.frame = CGRectMake(timeWidthUnit * [NOW timeIntervalSinceDate:kContentManager.minimumDate], 0.0f, 2.0f, CGRectGetHeight(dataCollectionView.frame));
+        nowLineView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+        [dataCollectionView addSubview:nowLineView];
+    }
+}
+
 #pragma mark - UICollectionViewDelegate methods
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
@@ -106,7 +120,7 @@
     } else if (collectionView == rowTitlesCollectionView) {
         return rowTitles.count;
     } else {
-        return rowTitles.count;
+        return dataArray.count;
     }
     
     return 0;
@@ -118,7 +132,7 @@
     } else if (collectionView == columnTitlesCollectionView) {
         return columnTitles.count;
     } else {
-        return columnTitles.count;
+        return ((IBTVChannel*)[dataArray objectAtIndex:section]).program.count;
     }
     return 0;
 }
@@ -134,38 +148,47 @@
         return cell;
     } else {
         IBProgramCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"dataCell" forIndexPath:indexPath];
-//        cell.value =[[dataArray objectAtIndex:indexPath.section] objectAtIndex:indexPath.row];
+        cell.program = [((IBTVChannel *)[dataArray objectAtIndex:indexPath.section]).program objectAtIndex:indexPath.row];
         return cell;
     }
     
     return nil;
 }
 
-- (CGSize)collectionView:(UICollectionView *)cv layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    if (cv == rowTitlesCollectionView) {
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (collectionView == rowTitlesCollectionView) {
         CGFloat cellWidth = 120.0f;
         CGFloat cellHeight = MIN(80.0f, ((CGRectGetHeight(dataCollectionView.frame) - 1.0f) / rowTitles.count));
         return CGSizeMake(cellWidth,cellHeight);
-    }
-    else if (cv == columnTitlesCollectionView) {
-        CGFloat cellWidth = MAX(200.0f, MIN(200.0f, ((CGRectGetWidth(dataCollectionView.frame) - 1.0f) / [[dataArray objectAtIndex:indexPath.section] count])));
+    } else if (collectionView == columnTitlesCollectionView) {
+        CGFloat cellWidth = 200.0f;
         CGFloat cellHeight = 44.0f;
         return CGSizeMake(cellWidth, cellHeight);
-    }
-    else {
-        CGFloat cellWidth = MAX(200.0f, MIN(200.0f, (CGRectGetWidth(dataCollectionView.frame) - 1.0f) / [[dataArray objectAtIndex:indexPath.section] count]));
+    } else {
+        IBProgramme *program = [((IBTVChannel*)[dataArray objectAtIndex:indexPath.section]).program objectAtIndex:indexPath.row];
+        CGFloat cellWidth = timeWidthUnit * [program getPlaytimeInSeconds];
         CGFloat cellHeight = MIN(80.0f, ((CGRectGetHeight(dataCollectionView.frame) - 1.0f) / rowTitles.count));
         return CGSizeMake(cellWidth, cellHeight);
     }
 }
 
-
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
-    return 0.0f;
+    return 2.0f;
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
-    return 1.0f;
+    return 2.0f;
+}
+
+- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
+    if (collectionView == dataCollectionView) {
+        if (section < dataArray.count) {
+            IBTVChannel *channel = [dataArray objectAtIndex:section];
+            return UIEdgeInsetsMake(0.0f, timeWidthUnit * [kContentManager delayForChannelFromMinimumDate:channel], 0.0f, 0.0f);
+        }
+    }
+    
+    return UIEdgeInsetsZero;
 }
 
 #pragma mark - UIScrollViewDelegate methods

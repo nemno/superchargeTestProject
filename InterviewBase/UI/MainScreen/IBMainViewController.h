@@ -10,8 +10,8 @@
 #import "IBBaseViewController.h"
 #import "IBProgramCollectionView.h"
 
-@interface IBMainViewController : IBBaseViewController
-{
+@interface IBMainViewController : IBBaseViewController {
     IBProgramCollectionView *collectionView;
 }
+
 @end

@@ -7,7 +7,6 @@
 //
 
 #import "IBContentManager.h"
-#import "IBTVChannel.h"
 
 @implementation IBContentManager
 @synthesize channels;
@@ -38,6 +37,10 @@
                             [tempChannelsArray addObject:channel];
                         }
                         self.channels = [NSArray arrayWithArray:tempChannelsArray];
+                        
+                        [self calculateMinimumDate];
+                        [self calculateMaximumDate];
+                        
                         return completion(self.channels, nil);
                     }
                 }
@@ -47,6 +50,48 @@
             return completion(data, error);
         }];
     }
+}
+
+- (void)calculateMinimumDate {
+    NSDate *minDate = nil;
+    for (IBTVChannel *channel in self.channels) {
+        NSDate *channelMinimumDate = [channel getMinimumDate];
+
+        if (minDate) {
+            if ([minDate compare:channelMinimumDate] == NSOrderedDescending) {
+                minDate = channelMinimumDate;
+            }
+        } else {
+            minDate = channelMinimumDate;
+        }
+    }
+    
+    self.minimumDate = minDate;
+}
+
+- (void)calculateMaximumDate {
+    NSDate *maxDate = nil;
+    for (IBTVChannel *channel in self.channels) {
+        NSDate *channelMaximumDate = [channel getMaximumDate];
+        
+        if (maxDate) {
+            if ([maxDate compare:channelMaximumDate] == NSOrderedAscending) {
+                maxDate = channelMaximumDate;
+            }
+        } else {
+            maxDate = channelMaximumDate;
+        }
+    }
+    
+    self.maximumDate = maxDate;
+}
+
+- (NSTimeInterval)delayForChannelFromMinimumDate:(IBTVChannel *)channel {
+    if (self.minimumDate) {
+        return [[channel getMinimumDate] timeIntervalSinceDate:self.minimumDate];
+    }
+    
+    return 0;
 }
 
 @end
